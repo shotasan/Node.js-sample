@@ -4,7 +4,7 @@ const http = require("http");
 var server = http.createServer(
   (request, response) => {
     // endはクライアントへの返信を終了するメソッド
-    response.end("Hello Node.js");
+    response.end('<html><body><h1>Hello</h1><p>Welcome to Node.js</p></body></html>');
   }
 );
 // http.Serverオブジェクトを待ち受け状態にする
