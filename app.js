@@ -14,18 +14,25 @@ server.listen(3000);
 console.log("Server start!");
 
 function getFromClient(request, response) {
-  var url_parts = url.parse(request.url);
+  // parseメソッドの第二引数にtrueを指定するとクエリパラメーター部分もパース処理される
+  var url_parts = url.parse(request.url, true);
   switch (url_parts.pathname) {
     case "/":
+      var content = "これはIndexページです。"
+      // queryプロパティからパースされたクエリパラメーターを取得する
+      var query = url_parts.query;
+      if (query.msg != undefined) {
+        // contentの内容にクエリパラメータに渡されたmsg部分を追加する
+        content += `あなたは「${query.msg}」と送りました`
+      }
       var content = ejs.render(index_page, {
         title: "Index",
-        content: "これはテンプレートを使ったサンプルページです。"
+        content: content
       });
       response.writeHead(200, { "Content-Type": "text/html" });
       response.write(content);
       response.end();
       break;
-    // リンク時のURLにレンダリング処理を追加する
     case "/other":
       var content = ejs.render(other_page, {
         title: "Other",
