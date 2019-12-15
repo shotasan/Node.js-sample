@@ -14,7 +14,11 @@ console.log("Server start!");
 
 function getFromClient(request, response) {
   // レンダリングの実行（HTMLファイルへの変換）
-  var content = ejs.render(index_page);
+  // renderの第二引数にオブジェクトを指定し、ejfファイルに値を渡す
+  var content = ejs.render(index_page, {
+    title: "Index",
+    content: "これはテンプレートを使ったサンプルページです。"
+  });
   response.writeHead(200, { "Content-Type": "text/html" });
   response.write(content);
   response.end();
