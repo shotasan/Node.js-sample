@@ -1,11 +1,11 @@
 const http = require("http");
 const fs = require("fs");
 const ejs = require("ejs");
-// urlオブジェクトの作成
 const url = require("url");
 
 const index_page = fs.readFileSync("./index.ejs", "utf8");
-// スタイルファイルの読み込み
+// テンプレートの読み込み
+const other_page = fs.readFileSync("./other.ejs", "utf8");
 const style_css = fs.readFileSync("./style.css", "utf8");
 
 var server = http.createServer(getFromClient);
@@ -15,7 +15,6 @@ console.log("Server start!");
 
 function getFromClient(request, response) {
   var url_parts = url.parse(request.url);
-  // pathnameプロパティから/以下のパスを取得する
   switch (url_parts.pathname) {
     case "/":
       var content = ejs.render(index_page, {
@@ -26,7 +25,16 @@ function getFromClient(request, response) {
       response.write(content);
       response.end();
       break;
-    // index.ejsのlinkからstyle.cssにアクセスした際にcssが帰るようにする
+    // リンク時のURLにレンダリング処理を追加する
+    case "/other":
+      var content = ejs.render(other_page, {
+        title: "Other",
+        content: "これは新しく用意したページです。"
+      });
+      response.writeHead(200, { "Content-Type": "text/html" });
+      response.write(content);
+      response.end();
+      break;
     case "/style.css":
       response.writeHead(200, { "Content-Type": "text/css" });
       response.write(style_css);
