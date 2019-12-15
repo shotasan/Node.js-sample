@@ -36,11 +36,19 @@ function getFromClient(request, response) {
   }
 }
 
+var data = {
+  "Taro": "00-0000-0000",
+  "Hanako": "00-0000-0000",
+  "Sachiko": "00-0000-0000",
+  "Ichiro": "00-0000-0000",
+};
+
 function response_index(request, response) {
   var msg = "これはIndexページです。"
   var content = ejs.render(index_page, {
     title: "Index",
-    content: msg
+    content: msg,
+    data: data
   });
   response.writeHead(200, { "Content-Type": "text/html" });
   response.write(content);
