@@ -43,6 +43,13 @@ var data = {
   "Ichiro": "00-0000-0000",
 };
 
+var data2 = {
+  "taro": ["taro@yamada", "00-000-000", "Tokyo"],
+  "jiro": ["taro@yamada", "00-000-000", "Tokyo"],
+  "sabu": ["taro@yamada", "00-000-000", "Tokyo"],
+  "yobu": ["taro@yamada", "00-000-000", "Tokyo"]
+}
+
 function response_index(request, response) {
   var msg = "これはIndexページです。"
   var content = ejs.render(index_page, {
@@ -58,33 +65,13 @@ function response_index(request, response) {
 
 function response_other(request, response) {
   var msg = "これはOtherページです。"
-
-  if (request.method == "POST") {
-    var body = '';
-
-    request.on('data', (data) => {
-      body += data;
-    });
-
-    request.on('end', () => {
-      var post_data = qs.parse(body);
-      msg += `あなたは「${post_data.msg}」と書きました。`;
-      var content = ejs.render(other_page, {
-        title: "Other",
-        content: msg
-      });
-      response.writeHead(200, { "Content-Type": "text/html" });
-      response.write(content);
-      response.end();
-    });
-  } else {
-    var msg = "ページがありません。"
-    var content = ejs.render(other_page, {
-      title: "Other",
-      content: msg
-    });
-    response.writeHead(200, { "Content-Type": "text/html" });
-    response.write(content);
-    response.end();
-  }
-}
+  var content = ejs.render(other_page, {
+    title: "Other",
+    content: msg,
+    data: data2,
+    filename: "data_item"
+  });
+  response.writeHead(200, { "Content-Type": "text/html" });
+  response.write(content);
+  response.end();
+};
