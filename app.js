@@ -2,7 +2,6 @@ const http = require("http");
 const fs = require("fs");
 const ejs = require("ejs");
 const url = require("url");
-// テキストをパース処理するためのQueryStringモジュールをロード
 const qs = require("querystring");
 
 const index_page = fs.readFileSync("./index.ejs", "utf8");
@@ -54,7 +53,6 @@ var data2 = {
 var data = { msg: "no message..." }
 
 function response_index(request, response) {
-  // 入力があった場合にグローバル変数dataを上書き
   if (request.method == "POST") {
     var body = "";
 
@@ -64,6 +62,8 @@ function response_index(request, response) {
 
     request.on("end", () => {
       data = qs.parse(body);
+      // setCookieメソッドにresponseオブジェクトを渡し、ヘッダーを付与する
+      setCookie("msg", data.msg, response);
       write_index(request, response);
     });
   } else {
@@ -73,14 +73,44 @@ function response_index(request, response) {
 
 function write_index(request, response) {
   var msg = "✳︎伝言を表示します";
+  // クッキーの値を取得してページに表示する
+  var cookie_data = getCookie("msg", request);
   var content = ejs.render(index_page, {
     title: "Index",
     content: msg,
-    data: data
+    data: data,
+    cookie_data: cookie_data
   });
   response.writeHead(200, { "Content-Type": "text/html" });
   response.write(content);
   response.end();
+}
+
+function setCookie(key, value, response) {
+  // escape()文字列を16進数エスケープシーケンスに置換
+  var cookie = escape(value);
+  // レスポンスにヘッダーを設定する。ここでは["msg=16進数"]が帰る
+  response.setHeader("Set-Cookie", [key + "=" + cookie]);
+}
+
+function getCookie(key, request) {
+  // requestオブジェクトにcookieプロパティが存在すればそれをcookie_dataに格納する
+  var cookie_data = request.headers.cookie != undefined ?
+    request.headers.cookie : "";
+  // cookieは複数設定され、;で区切られるためsplitで各個に分割する
+  var data = cookie_data.split(";");
+  for (var i in data) {
+    // trim()文字列の両端の空白を削除します。
+    // startsWith() メソッドは文字列が引数で指定された文字列で始まるかを判定して true か false を返します。
+    if (data[i].trim().startsWith(key + "=")) {
+      // substring() メソッドは string オブジェクトの開始・終了インデックスの間、または文字列の最後までの部分集合を返します。
+      // substring()でkey名=以後の値を取得する
+      var result = data[i].trim().substring(key.length + 1);
+      // unescape() 関数は 16 進数エスケープシーケンスをそれが表す文字列に置換します。
+      return unescape(result);
+    }
+  }
+  return "";
 }
 
 function response_other(request, response) {
