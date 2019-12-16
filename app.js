@@ -50,13 +50,33 @@ var data2 = {
   "yobu": ["taro@yamada", "00-000-000", "Tokyo"]
 }
 
+// グローバル変数を定義
+var data = { msg: "no message..." }
+
 function response_index(request, response) {
-  var msg = "これはIndexページです。"
+  // 入力があった場合にグローバル変数dataを上書き
+  if (request.method == "POST") {
+    var body = "";
+
+    request.on("data", (data) => {
+      body += data;
+    });
+
+    request.on("end", () => {
+      data = qs.parse(body);
+      write_index(request, response);
+    });
+  } else {
+    write_index(request, response);
+  }
+}
+
+function write_index(request, response) {
+  var msg = "✳︎伝言を表示します";
   var content = ejs.render(index_page, {
     title: "Index",
     content: msg,
-    data: data,
-    filename: 'data_item'
+    data: data
   });
   response.writeHead(200, { "Content-Type": "text/html" });
   response.write(content);
